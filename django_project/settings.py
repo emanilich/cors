@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from environs import Env # EM
 
+env = Env()  # EM
+env.read_env()  # EM
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-j!*n#3ainmyxud_(lf*vn^f9zkmxrti^x+64816i7u_$o7pp*3'
+SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = ["127.0.0.1","https://8000-cs-911624661305-default.cs-us-east1-vpcf.cloudshell.dev"]
+ALLOWED_HOSTS = [".herokuapp.com", "localhost", "127.0.0.1","https://8000-cs-911624661305-default.cs-us-east1-vpcf.cloudshell.dev"]
 CSRF_TRUSTED_ORIGINS = ["https://sendgrid.net","https://8000-cs-911624661305-default.cs-us-east1-vpcf.cloudshell.dev"]
 
 # Application definition
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+     "whitenoise.runserver_nostatic",  # EM
     'django.contrib.staticfiles',
     # 3rd pary
     "crispy_forms", # EM
@@ -53,6 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # EM
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -85,10 +89,7 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": env.dj_db_url("DATABASE_URL")    
 }
 
 
@@ -127,6 +128,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [str(BASE_DIR.joinpath("static"))]  # EM
+STATIC_ROOT = str(BASE_DIR.joinpath("staticfiles"))  # EM
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"  # EM
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -145,12 +150,12 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"  # EM
 DEFAULT_FROM_EMAIL = "manilich@gmail.com"
 EMAIL_HOST = "smtp.sendgrid.net"
 EMAIL_HOST_USER = "apikey"
-EMAIL_HOST_PASSWORD = "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"
+EMAIL_HOST_PASSWORD = env.str('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-env = Env()  # EM
-env.read_env()  # EM
+
+
 
   
 
